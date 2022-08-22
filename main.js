@@ -10,7 +10,7 @@ const remove = document.querySelectorAll('.remove')
 document.querySelector('.submit').addEventListener('click', submitForm)
 
 function submitForm(e) {
-    if (nameInput.value === '' || locationInput.value === '') {
+    if (nameInput.value.length < 2 || locationInput.value.length < 2 ) {
         return
     }
     
