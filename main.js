@@ -10,7 +10,8 @@ const remove = document.querySelectorAll('.remove')
 document.querySelector('.submit').addEventListener('click', submitForm)
 
 function submitForm(e) {
-    if (nameInput.value.length < 2 || locationInput.value.length < 2 ) {
+    const http = photoInput.value.slice(0,4)
+    if (nameInput.value.length < 2 || locationInput.value.length < 2 || http !== 'http') {
         return
     }
     
