@@ -7,14 +7,9 @@ const wishList = document.getElementById('wishList')
 const edits = document.querySelectorAll('.edit')
 const remove = document.querySelectorAll('.remove')
 
-document.querySelector('.submit').addEventListener('click', submitForm)
+document.querySelector('form').addEventListener('submit', submitForm)
 
 function submitForm(e) {
-    const http = photoInput.value.slice(0,4)
-    if (nameInput.value.length < 2 || locationInput.value.length < 2 || http !== 'http') {
-        return
-    }
-    
     e.preventDefault()
     const card = document.createElement('div')
     card.classList.add('card')
@@ -72,7 +67,7 @@ function promptEdit(e) {
     const photo = e.target.parentNode.parentNode.parentNode.children[0]
     const description = e.target.parentNode.parentNode.children[2]
 
-    const newName = window.prompt('Enter new name')
+    const newName = prompt('Enter new name')
     const newLocation = prompt('Enter new location')
     const newPhoto = prompt('Enter new photo url')
     const newDescription = prompt('Enter new description')
