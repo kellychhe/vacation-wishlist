@@ -1,36 +1,65 @@
-const nameInput = document.getElementById('name')
-const locationInput = document.getElementById('location')
-const photoInput = document.getElementById('photo')
-const descriptionInput = document.getElementById('description')
+const apiKey = config.apiKey
+const resource = 'https://api.unsplash.com/photos/random/'
 const cardContainer = document.querySelector('.destinations')
 const wishList = document.getElementById('wishList')
-const edits = document.querySelectorAll('.edit')
-const remove = document.querySelectorAll('.remove')
+const form = document.getElementById('vacationForm')
 
-document.querySelector('form').addEventListener('submit', submitForm)
+form.addEventListener('submit', submitForm)
 
-function submitForm(e) {
+async function submitForm(e) {
     e.preventDefault()
+    const formData = new FormData(form)
+
+    const name = formData.get('name')
+    const location = formData.get('location')
+    const description = formData.get('description')
+
+    const randomImage = await getRandomImage(`${name} ${location}`)
+    let photoSrc = randomImage ? randomImage : formData.get('photo')
+    
+    createCard(photoSrc, name, location, description)
+
+    wishList.innerText = 'My WishList'
+    for (let i = 1; i < e.target.children.length; i++) {
+        e.target.children[i].querySelector('input').value = ''
+    }
+}
+
+async function getRandomImage(queryString) {
+    const url = `${resource}?client_id=${apiKey}&orientation=landscape&query=${encodeURIComponent(queryString)}`
+    try {
+        let response = await fetch(url)
+        let image = await response.json()
+        console.log(image.urls.thumb)
+        return image.urls.thumb
+    } catch (error) {
+        console.log(error)
+    }
+}
+
+function createCard(photoSrc, name, location, description) {
     const card = document.createElement('div')
     card.classList.add('card')
+    cardContainer.append(card)
 
     const image = document.createElement('img')
     image.classList.add('card-img-top')
-    image.src = photo.value === '' ? 'default.jpeg' : photoInput.value
-
+    image.src = photoSrc
     const cardBody = document.createElement('div')
     cardBody.classList.add('card-body')
+    card.append(image, cardBody)
 
-    const name = document.createElement('div')
-    name.classList.add('card-title')
-    name.innerText = nameInput.value
+    const nameEl = document.createElement('div')
+    nameEl.classList.add('card-title')
+    nameEl.innerText = name
+    const locationEl = document.createElement('span')
+    locationEl.innerText = location
+    const descriptionEl = document.createElement('p')
+    descriptionEl.innerText = description
+    cardBody.append(nameEl, locationEl, descriptionEl, createButtons())
+}
 
-    const location = document.createElement('span')
-    location.innerText = locationInput.value
-
-    const description = document.createElement('p')
-    description.innerText = descriptionInput.value
-
+function createButtons() {
     const buttonContainer = document.createElement('div')
     buttonContainer.classList.add('d-flex')
     buttonContainer.classList.add('justify-content-between')
@@ -41,6 +70,7 @@ function submitForm(e) {
     edit.classList.add('btn-warning')
     edit.innerText = "Edit"
     edit.addEventListener('click', promptEdit)
+
     const remove = document.createElement('button')
     remove.classList.add('remove')
     remove.classList.add('btn')
@@ -48,35 +78,33 @@ function submitForm(e) {
     remove.innerText = "Remove"
     remove.addEventListener('click', removeDestination)
 
-
-    cardContainer.append(card)
-    card.append(image, cardBody)
-    cardBody.append(name, location, description, buttonContainer)
     buttonContainer.append(edit, remove)
-
-    wishList.innerText = 'My WishList'
-    nameInput.value = ''
-    locationInput.value = ''
-    photoInput.value = ''
-    descriptionInput.value = ''
+    return buttonContainer
 }
 
-function promptEdit(e) {
+async function promptEdit(e) {
+    const photo = e.target.parentNode.parentNode.parentNode.children[0]
     const name = e.target.parentNode.parentNode.children[0]
     const location = e.target.parentNode.parentNode.children[1]
-    const photo = e.target.parentNode.parentNode.parentNode.children[0]
     const description = e.target.parentNode.parentNode.children[2]
 
     const newName = prompt('Enter new name')
     const newLocation = prompt('Enter new location')
-    const newPhoto = prompt('Enter new photo url')
     const newDescription = prompt('Enter new description')
 
     newName ? name.innerText = newName : null
     newLocation ? location.innerText = newLocation : null
-    newPhoto ? photo.src = newPhoto : null
     newDescription ? description.innerText = newDescription : null
 
+    const newPhoto = await getRandomImage(`${newName} ${newLocation}`)
+
+    if (newPhoto && (newName || newLocation)) {
+        photo.src = newPhoto
+    } else if (!newName && !newLocation) {
+        null
+    } else {
+        photo.src = '/default.jpeg'
+    }
 }
 
 function removeDestination(e) {
