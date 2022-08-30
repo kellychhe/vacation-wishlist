@@ -1,5 +1,5 @@
 const apiKey = config.apiKey
-const resource = 'https://api.unsplash.com/photos/random/'
+const resource = 'https://api.unsplash.com/search/photos/'
 const cardContainer = document.querySelector('.destinations')
 const wishList = document.getElementById('wishList')
 const form = document.getElementById('vacationForm')
@@ -7,21 +7,24 @@ const form = document.getElementById('vacationForm')
 form.addEventListener('submit', submitForm)
 
 async function submitForm(e) {
-    e.preventDefault()
-    const formData = new FormData(form)
-
-    const name = formData.get('name')
-    const location = formData.get('location')
-    const description = formData.get('description')
-
-    const randomImage = await getRandomImage(`${name} ${location}`)
-    let photoSrc = randomImage ? randomImage : formData.get('photo')
     
-    createCard(photoSrc, name, location, description)
-
-    wishList.innerText = 'My WishList'
-    for (let i = 1; i < e.target.children.length; i++) {
-        e.target.children[i].querySelector('input').value = ''
+    try {
+        e.preventDefault()
+        const formData = new FormData(form)
+    
+        const name = formData.get('name')
+        const location = formData.get('location')
+        const description = formData.get('description')
+    
+        const randomImage = await getRandomImage(`${name} ${location}`)
+        let photoSrc = randomImage ? randomImage : formData.get('photo')
+        
+        createCard(photoSrc, name, location, description)
+    
+        wishList.innerText = 'My WishList'
+        clearForm()
+    } catch (error) {
+     console.log(error)   
     }
 }
 
@@ -29,9 +32,9 @@ async function getRandomImage(queryString) {
     const url = `${resource}?client_id=${apiKey}&orientation=landscape&query=${encodeURIComponent(queryString)}`
     try {
         let response = await fetch(url)
-        let image = await response.json()
-        console.log(image.urls.thumb)
-        return image.urls.thumb
+        let images = await response.json()
+        const randomIndex = Math.floor(Math.random() * images.results.length)
+        return images.results[randomIndex].urls.thumb
     } catch (error) {
         console.log(error)
     }
@@ -111,5 +114,11 @@ function removeDestination(e) {
     e.target.parentNode.parentNode.parentNode.remove()
     if (cardContainer.children.length === 0) {
         wishList.innerText = 'Enter Destination Details'
+    }
+}
+
+function clearForm() {
+    for (let i = 1; i < form.children.length; i++) {
+        form.children[i].querySelector('input').value = ''
     }
 }
