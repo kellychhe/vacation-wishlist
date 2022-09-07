@@ -7,7 +7,7 @@ const MongoClient = require('mongodb').MongoClient
 const app = express()
 
 dotenv.config()
-app.listen(9000)
+app.listen(process.env.port || 9000)
 
 const connectionString = process.env.MONGODB
 
