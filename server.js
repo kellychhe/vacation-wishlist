@@ -16,7 +16,7 @@ MongoClient.connect(connectionString, { useUnifiedTopology: true })
         const db = client.db('vacation-wishlist')
         const destinationsCollection = db.collection('destinations')
 
-        // app.set('views', './view')
+        app.set('views', './view')
         app.set('view engine', 'ejs')
 
         app.use(express.static('public'))
