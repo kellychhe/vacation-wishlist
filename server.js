@@ -1,13 +1,12 @@
 const express = require('express')
 const bodyParser = require('body-parser')
-const dotenv = require('dotenv')
+require('dotenv').config()
 const fetch = require('node-fetch')
 const ObjectId = require('mongodb').ObjectId
 const MongoClient = require('mongodb').MongoClient
 const app = express()
 
-dotenv.config()
-app.listen(process.env.port || 9000)
+
 
 const connectionString = process.env.MONGODB
 
@@ -17,9 +16,7 @@ MongoClient.connect(connectionString, { useUnifiedTopology: true })
         const db = client.db('vacation-wishlist')
         const destinationsCollection = db.collection('destinations')
 
-        app.listen(8000)
-
-        app.set('views', './view');
+        // app.set('views', './view')
         app.set('view engine', 'ejs')
 
         app.use(express.static('public'))
@@ -79,6 +76,8 @@ MongoClient.connect(connectionString, { useUnifiedTopology: true })
             })
             .catch(error => console.error(error))
         })
+
+        app.listen(process.env.PORT || 9000)
     })
     .catch(error => console.error(error))
 
@@ -93,3 +92,4 @@ MongoClient.connect(connectionString, { useUnifiedTopology: true })
             console.log(error)
         }
     }
+
