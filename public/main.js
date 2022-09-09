@@ -9,7 +9,6 @@ Array.from(editButton).forEach(function(element) {
         const newLocation = prompt('Enter new location') 
         const newDescription = prompt('Enter new description') 
         const changePhoto = newName || newLocation ? true : false
-        console.log(cardBody.parentNode.children[1].src)
 
         fetch('destinations', {
             method: 'put',
